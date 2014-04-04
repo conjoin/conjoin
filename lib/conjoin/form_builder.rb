@@ -124,7 +124,7 @@ module Conjoin
           options = opts.merge options
         end
 
-        input_class = "FormBuilder::#{record_type}Input".constantize
+        input_class = "Conjoin::FormBuilder::#{record_type}Input".constantize
 
         data = OpenStruct.new({
           name: nested_name,

@@ -36,6 +36,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "unicorn"
   spec.add_dependency "clap"
   spec.add_dependency "shield"
+  spec.add_dependency "better_errors"
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"

@@ -24,9 +24,11 @@ module Conjoin
           end
 
           if Conjoin.env.test? or Conjoin.env.development?
-            require 'pry'
-            require 'pry-rescue'
-            use PryRescue::Rack
+            require 'better_errors'
+            use BetterErrors::Middleware
+          #   require 'pry'
+          #   require 'pry-rescue'
+          #   use PryRescue::Rack
           end
 
           # continue running the application
