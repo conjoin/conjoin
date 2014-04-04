@@ -74,7 +74,7 @@ module Conjoin
 
     def url_for_event event, options = {}
       widget_name = req.env[:widget_name]
-      "#{path_for('widgets')}?widget_event=#{event}&widget_name=#{widget_name}&" + URI.encode_www_form(options)
+      "#{Conjoin.env.mounted?? settings[:mounted_url] : ''}/widgets?widget_event=#{event}&widget_name=#{widget_name}&" + URI.encode_www_form(options)
     end
 
     def load_widgets
