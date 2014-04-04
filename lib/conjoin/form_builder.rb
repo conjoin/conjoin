@@ -1,3 +1,5 @@
+require "rack/csrf"
+
 module Conjoin
   module FormBuilder
     INPUTS = [
@@ -8,12 +10,9 @@ module Conjoin
 
     def self.setup app
       require 'mab/kernel_method'
-      require "cuba/sugar/content_for"
-      require "cuba/sugar/csrf"
 
-      app.plugin Cuba::Sugar::ContentFor
       app.use Rack::Csrf
-      app.plugin Cuba::Sugar::Csrf
+      app.plugin Conjoin::Csrf
       # Dir["#{File.dirname(__FILE__)}/plugin/inputs/**/*.rb"].each  { |rb| require rb  }
       INPUTS.each do |input|
         require_relative "inputs/#{input}"

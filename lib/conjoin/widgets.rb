@@ -10,7 +10,6 @@ module Conjoin
       self.app = app
       app.settings[:widgets_root] = "#{app.root}/app/widgets"
       app.settings[:widgets] ||= {}
-      app.plugin Cuba::Sugar
 
       Dir["#{app.root}/app/widgets/**/*.rb"].each  { |rb| require rb  }
     end
@@ -91,7 +90,7 @@ module Conjoin
       end
 
       settings[:widgets].each do |name, widget|
-        req.env[:loaded_widgets][name] = widget.new(self, res, req, settings, event, name, opts)
+        req.env[:loaded_widgets][name] = widget.constantize.new(self, res, req, settings, event, name, opts)
       end
 
       [widget_name, incoming_event, event]
@@ -304,13 +303,12 @@ module Conjoin
     class Routes < Struct.new(:settings)
       def app
         App.settings = settings
-        App.plugin Conjoin::Render
-        App.plugin Auth
-        App.plugin Assets
-        App.plugin CommonPlugin
+        App.plugin Conjoin::Cuba::Render
+        App.plugin Conjoin::Auth
+        App.plugin Conjoin::Assets
         App.plugin Conjoin::I18N
-        App.plugin FormBuilder
-        App.plugin Widgets
+        App.plugin Conjoin::FormBuilder
+        App.plugin Conjoin::Widgets
 
         App
       end

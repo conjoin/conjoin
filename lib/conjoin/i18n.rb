@@ -7,7 +7,7 @@ module Conjoin
 
     def self.setup(app)
       app.settings[:default_locale] = 'en-US'
-      app.settings[:translations] = File.join(Conjoin.root, 'i18n')
+      app.settings[:translations] = File.join(app.root, 'i18n')
       ::R18n::Filters.off :untranslated
       ::R18n::Filters.on :untranslated_html
       if Conjoin.env.test? or Conjoin.env.development?

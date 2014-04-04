@@ -23,6 +23,7 @@ module Conjoin
   autoload :FormBuilder , "conjoin/form_builder"
   autoload :I18N        , "conjoin/i18n"
   autoload :Widgets     , "conjoin/widgets"
+  autoload :Csrf        , "conjoin/csrf"
   # ActionMailer
   # https://gist.github.com/acwright/1944639
   # DelayedJob

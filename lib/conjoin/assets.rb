@@ -71,8 +71,9 @@ module Conjoin
     private
 
     def cache_string
-      if Conjoin.env.production?
+      if Conjoin.env.mounted?
         # @cache_string ||= (File.read "#{Assets.app.root}/sha") + "/"
+        "/"
       end
     end
 
@@ -142,14 +143,14 @@ module Conjoin
 
     class Helpers
       def asset_path path
-        Conjoin.root + '/app/assets/' + path
+        app.root + '/app/assets/' + path
       end
     end
 
     class Routes < Struct.new(:settings)
       def app
         App.settings = settings
-        App.root = settings[:root]
+        App.root = Conjoin::Assets.app.root
         App.plugin Conjoin::Cuba::Render
         App.plugin Assets
         App
