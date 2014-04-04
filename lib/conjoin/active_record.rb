@@ -16,7 +16,6 @@ module Conjoin
         require 'protector'
         Protector::Adapters::ActiveRecord.activate!
         start_active_record
-      else
         ActiveRecord::Base.default_timezone = Time.zone
       end
     end
