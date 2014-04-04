@@ -11,6 +11,10 @@ module Conjoin
       def root
         @root ||= Conjoin.root
       end
+
+      def root= root
+        @root = root
+      end
     end
 
     module Render

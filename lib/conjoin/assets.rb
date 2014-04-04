@@ -150,7 +150,7 @@ module Conjoin
       def app
         App.settings = settings
         App.root = settings[:root]
-        App.plugin Conjoin::Render
+        App.plugin Conjoin::Cuba::Render
         App.plugin Assets
         App
       end
