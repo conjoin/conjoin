@@ -132,16 +132,17 @@ module Conjoin
 
     class Base
       JS_ESCAPE = { '\\' => '\\\\', '</' => '<\/', "\r\n" => '\n', "\n" => '\n', "\r" => '\n', '"' => '\\"', "'" => "\\'" }
-      attr_accessor :app, :res, :req, :settings, :event, :folder, :options
+      attr_accessor :app, :res, :req, :settings, :event, :folder, :options, :widget_state
 
       def initialize app, res, req, settings, event, folder, options
-        @app      = app
-        @res      = res
-        @req      = req
-        @settings = settings
-        @event    = event
-        @folder   = folder
-        @options  = options
+        @app          = app
+        @res          = res
+        @req          = req
+        @settings     = settings
+        @event        = event
+        @folder       = folder
+        @options      = options
+        @widget_state = false
 
         # add the widget to the req widgets
         req.env[:widgets] ||= {}
@@ -169,6 +170,7 @@ module Conjoin
         @options[:replace] = true
 
         if !state.is_a? String
+          opts[:state] = state
           content = render state, opts
           selector = '#' + id_for(state)
         else
@@ -223,6 +225,14 @@ module Conjoin
         end
       end
 
+      def set_state state
+        @widget_state = state
+      end
+
+      def render_state
+        render state: widget_state
+      end
+
       def render *args
         if args.first.kind_of? Hash
           locals = args.first
@@ -232,6 +242,7 @@ module Conjoin
           state = view = args.first
           locals = args.length > 1 ? args.last : {}
         end
+        state = @widget_state if widget_state
 
         unless view
           state = view = caller[0][/`.*'/][1..-2]
@@ -241,7 +252,7 @@ module Conjoin
           end
         end
 
-        if locals.key?(:state) and state.to_s == view
+        if locals.key?(:state) and state.to_s == view.to_s
           return send state
         end
 

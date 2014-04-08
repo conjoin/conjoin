@@ -4,6 +4,7 @@ require "conjoin/middleware"
 require "conjoin/env_string"
 require "conjoin/class_methods"
 require "conjoin/cuba"
+require "conjoin/seeds"
 
 module Conjoin
   extend ClassMethods

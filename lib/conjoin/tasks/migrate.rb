@@ -29,7 +29,7 @@ module ActiveRecordTasks
       silence_activerecord do
         load("db/seeds.rb")
         if not file
-          Seeds.run
+          Conjoin::Seeds.run
         else
           load("db/seeds/#{file}.rb")
         end
