@@ -8,7 +8,7 @@ module Conjoin
 
     def self.setup app
       self.app = app
-      app.settings[:widgets_root] = "#{app.root}/app/widgets"
+      app.settings[:widgets_root] ||= "#{app.root}/app/widgets"
       app.settings[:widgets] ||= {}
 
       Dir["#{app.root}/app/widgets/**/*.rb"].each  { |rb| require rb  }
@@ -314,6 +314,7 @@ module Conjoin
     class Routes < Struct.new(:settings)
       def app
         App.settings = settings
+        App.root     = settings[:root]
         App.plugin Conjoin::Cuba::Render
         App.plugin Conjoin::Auth
         App.plugin Conjoin::Assets
