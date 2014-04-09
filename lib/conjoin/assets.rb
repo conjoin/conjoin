@@ -150,7 +150,7 @@ module Conjoin
     class Routes < Struct.new(:settings)
       def app
         App.settings = settings
-        App.root = Conjoin::Assets.app.root
+        App.root = settings[:root]
         App.plugin Conjoin::Cuba::Render
         App.plugin Assets
         App
