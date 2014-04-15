@@ -3,9 +3,9 @@ require "rack/csrf"
 module Conjoin
   module FormBuilder
     INPUTS = [
-      :boolean, :checkbox, :date, :decimal, :file, :hidden,
-      :integer, :password, :radio, :select, :state, :string,
-      :time
+      :boolean , :checkbox , :date  , :decimal , :file  , :hidden ,
+      :integer , :password , :radio , :select  , :state , :string ,
+      :display , :datetime , :time  , :year
     ]
 
     def self.setup app

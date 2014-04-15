@@ -1,30 +1,31 @@
 module Conjoin
   module FormBuilder
     class SelectInput < Input
-      @select_options = {}
-
       def display
-        mab do
+        append_button = options.delete :append_button
+
+        content = mab do
           # automatically add a prompt by default
-          options[:prompt] = true unless options.key? :prompt
-          options[:class] += ' select2'
+          options[:prompt] = 'true' unless options.key? :prompt
+          options[:class] += ' selectize'
           selected_value = options.delete :value
 
           select options do
+            opts = {
+              value: ''
+            }
+
             if prompt = options.delete(:prompt)
-              opts = {
-                value: ''
-              }
               opts['selected'] = 'selected' unless selected_value
               option opts do
-                text prompt.to_s == 'true' ? 'Please Choose One.' : prompt
+                text! prompt.to_s == 'true' ? 'Please Choose One.' : prompt
               end
             end
 
             if not options[:group]
-              select_options.each do |name, value|
+              select_options.invert.each do |name, value|
                 option render_opts(value, selected_value, opts) do
-                  text name.titleize
+                  text (name != name.upcase ? name.titleize : name)
                 end
               end
             else
@@ -40,6 +41,21 @@ module Conjoin
             end
           end
         end
+
+        if not append_button
+          content
+        else
+          mab do
+            div class: 'input-group' do
+              text! content
+              div class: 'input-group-btn' do
+                button class: 'btn btn-primary', type: 'button', 'on-click-get' => append_button[:href] do
+                  text append_button[:text]
+                end
+              end
+            end
+          end
+        end
       end
 
       def render_opts value, selected_value, opts
@@ -49,18 +65,10 @@ module Conjoin
         if selected_value.is_a? ActiveRecord::Associations::CollectionProxy
           opts['selected'] = 'selected' if selected_value.map(&:id).include? value
         else
-          opts['selected'] = 'selected' if selected_value == value.to_s
+          opts['selected'] = 'selected' if selected_value.to_s == value.to_s
         end
 
         opts
-      end
-
-      def self.select_options
-        @select_options
-      end
-
-      def select_options
-        self.class.select_options.invert
       end
     end
   end

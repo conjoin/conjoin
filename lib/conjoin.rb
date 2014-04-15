@@ -25,6 +25,10 @@ module Conjoin
   autoload :I18N        , "conjoin/i18n"
   autoload :Widgets     , "conjoin/widgets"
   autoload :Csrf        , "conjoin/csrf"
+  autoload :As          , "conjoin/as"
+  autoload :Ui          , "conjoin/ui"
+  autoload :JQuery      , "conjoin/jquery"
+  autoload :Nav         , "conjoin/nav"
   # ActionMailer
   # https://gist.github.com/acwright/1944639
   # DelayedJob

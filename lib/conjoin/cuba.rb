@@ -64,7 +64,7 @@ module Conjoin
       end
 
       def partial template, locals = {}
-        partial_template = template.gsub(/([a-zA-Z_]+)$/, '_\1')
+        partial_template = template.to_s.gsub(/([a-zA-Z_]+)$/, '_\1')
         render(template_path(partial_template), locals, settings[:render][:options])
       end
     end

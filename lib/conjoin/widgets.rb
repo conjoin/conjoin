@@ -74,7 +74,7 @@ module Conjoin
 
     def url_for_event event, options = {}
       widget_name = req.env[:widget_name]
-      "#{Conjoin.env.mounted?? settings[:mounted_url] : ''}/widgets?widget_event=#{event}&widget_name=#{widget_name}&" + URI.encode_www_form(options)
+      "#{Conjoin.env.mounted?? settings[:mounted_url] : ''}/widgets?widget_event=#{event}&widget_name=#{widget_name}" + (options.any?? '&' + URI.encode_www_form(options) : '')
     end
 
     def load_widgets
@@ -184,7 +184,9 @@ module Conjoin
 
         res.write '$("' + selector + '").replaceWith("' + escape(content) + '");'
         # scroll to the top of the page just as if we went to the url directly
-        res.write 'window.scrollTo(0, 0);'
+        # if opts[:scroll_to_top]
+        #   res.write 'window.scrollTo(0, 0);'
+        # end
       end
 
       def hide selector
@@ -207,6 +209,11 @@ module Conjoin
 
       def escape js
         js.to_s.gsub(/(\\|<\/|\r\n|\\3342\\2200\\2250|[\n\r"'])/) {|match| JS_ESCAPE[match] }
+      end
+
+      def trigger event, data = {}
+        req.env[:widget_name] = req.params['widget_name']
+        trigger_event event, req.env[:widget_name], data.to_ostruct
       end
 
       def trigger_event event, widget_name, data = {}
@@ -233,6 +240,15 @@ module Conjoin
         render state: widget_state
       end
 
+      def partial view, options
+        render view, options
+      end
+
+      def partial template, locals = {}
+        locals[:partial] = template
+        render locals
+      end
+
       def render *args
         if args.first.kind_of? Hash
           locals = args.first
@@ -252,20 +268,26 @@ module Conjoin
           end
         end
 
-        if locals.key?(:state) and state.to_s == view.to_s
-          return send state
+        if locals.key?(:state) and state and state.to_s == view.to_s
+          if method(state).parameters.length > 0
+            send(state, locals)
+          else
+            send(state)
+          end
         end
 
         tmpl_engine = settings[:render][:template_engine]
 
         if (req_helper_methods = req.env[:widgets][folder][:req_helper_methods]) \
         and (!options.key?(:cache))
-          locals.merge! req_helper_methods
+          locals.reverse_merge! req_helper_methods
         else
           req.env[:widgets][folder][:req_helper_methods] = {}
 
           helper_methods.each do |method|
-            req.env[:widgets][folder][:req_helper_methods][method] = locals[method] = self.send method
+            unless locals.key? method
+              req.env[:widgets][folder][:req_helper_methods][method] = locals[method] = self.send method
+            end
           end
         end
 
@@ -274,7 +296,8 @@ module Conjoin
 
         locals[:w] = locals[:widget] = self
 
-        app.render "#{app.widgets_root}/#{folder}/#{view}.#{tmpl_engine}", locals
+        view_folder = self.class.to_s.gsub(/\w+::Widgets::/, '').split('::').map(&:underscore).join('/')
+        app.render "#{app.widgets_root}/#{view_folder}/#{view}.#{tmpl_engine}", locals
       end
 
       private
@@ -321,6 +344,7 @@ module Conjoin
         App.plugin Conjoin::I18N
         App.plugin Conjoin::FormBuilder
         App.plugin Conjoin::Widgets
+        App.plugin Conjoin::Ui
 
         App
       end

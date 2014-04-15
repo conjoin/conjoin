@@ -30,7 +30,7 @@ module Conjoin
 
     def current_user
       if not Conjoin.env.mounted?
-        authenticated(VendorWizard::User)
+        authenticated(Subro::Models::User)
       else
         req.env['warden'].authenticate(scope: :user)
       end

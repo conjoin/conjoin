@@ -81,13 +81,13 @@ module Conjoin
       Assets.app.settings[:assets]
     end
 
-    def  links_for type, opts = {}
+    def links_for type, opts = {}
       method    = :link
       path      = :href
       extention = :css
 
       options = {
-        'data-turbolinks-track' => true
+        'data-turbolinks-track' => 'true'
       }
 
       case type
