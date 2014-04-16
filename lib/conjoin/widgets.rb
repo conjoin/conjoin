@@ -73,7 +73,7 @@ module Conjoin
     end
 
     def url_for_event event, options = {}
-      widget_name = req.env[:widget_name]
+      widget_name = options.delete(:widget_name) || req.env[:widget_name]
       "#{Conjoin.env.mounted?? settings[:mounted_url] : ''}/widgets?widget_event=#{event}&widget_name=#{widget_name}" + (options.any?? '&' + URI.encode_www_form(options) : '')
     end
 
