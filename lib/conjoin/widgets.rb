@@ -260,7 +260,7 @@ module Conjoin
         end
         state = @widget_state if widget_state
 
-        unless view
+        unless view.present?
           state = view = caller[0][/`.*'/][1..-2]
 
           if (options.key?(:from_event) and !options.key?(:replace))
