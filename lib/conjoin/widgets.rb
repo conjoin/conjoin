@@ -48,7 +48,7 @@ module Conjoin
       widget = req.env[:loaded_widgets][name]
 
       if widget.method(state).parameters.length > 0
-        widget.send state, opts
+        widget.send state, opts.to_ostruct
       else
         widget.send state
       end
@@ -278,7 +278,7 @@ module Conjoin
 
         if locals.key?(:state) and state and state.to_s == view.to_s
           if method(state).parameters.length > 0
-            send(state, locals)
+            send(state, locals.to_ostruct)
           else
             send(state)
           end

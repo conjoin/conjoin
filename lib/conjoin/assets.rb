@@ -166,20 +166,34 @@ module Conjoin
         dir     = ''
         new_ext = false
 
+        case file
+        when /^bower/
+          dir = 'assets/'
+        when /^widgets/
+          dir = '/'
+        else
+          case ext
+          when 'js'
+            dir = 'assets/javascripts/'
+          when 'css'
+            dir = 'assets/stylesheets/'
+          else
+            dir = 'assets/'
+          end
+        end
+
         case ext
         when 'css'
-          dir     = !file[/^bower/] ? 'stylesheets/' : ''
           new_ext = 'scss' if stylesheet_assets.include? file + '.scss'
         when 'js'
-          dir     = !file[/^bower/] ? 'javascripts/' : ''
           new_ext = 'coffee' if javascript_assets.include? file + '.coffee' \
                              or javascript_head_assets.include? file + '.coffee'
         end
 
         if new_ext
-          render "#{Assets.app.root}/app/assets/#{dir}#{file}.#{new_ext}"
+          render "#{Assets.app.root}/app/#{dir}#{file}.#{new_ext}"
         else
-          File.read "#{Assets.app.root}/app/assets/#{dir}#{file}.#{ext}"
+          File.read "#{Assets.app.root}/app/#{dir}#{file}.#{ext}"
         end
       end
 
