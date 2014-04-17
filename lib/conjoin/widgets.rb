@@ -236,8 +236,16 @@ module Conjoin
         @widget_state = state
       end
 
-      def render_state
-        render state: widget_state
+      def state
+        @widget_state
+      end
+
+      def render_state options = {}
+        if method(state).parameters.length > 0
+          send(state, options.to_ostruct)
+        else
+          send(state)
+        end
       end
 
       def partial view, options
