@@ -278,9 +278,9 @@ module Conjoin
 
         if locals.key?(:state) and state and state.to_s == view.to_s
           if method(state).parameters.length > 0
-            send(state, locals.to_ostruct)
+            return send(state, locals.to_ostruct)
           else
-            send(state)
+            return send(state)
           end
         end
 
