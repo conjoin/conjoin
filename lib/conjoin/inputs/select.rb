@@ -3,11 +3,14 @@ module Conjoin
     class SelectInput < Input
       def display
         append_button = options.delete :append_button
+        if options[:multiple]
+          options[:name] += '[]'
+        end
 
         content = mab do
           # automatically add a prompt by default
           options[:prompt] = 'true' unless options.key? :prompt
-          options[:class] += ' selectize'
+          options[:class] += ' selectize' unless options.delete(:selectize) == false
           selected_value = options.delete :value
 
           select options do
@@ -64,6 +67,8 @@ module Conjoin
         }
         if selected_value.is_a? ActiveRecord::Associations::CollectionProxy
           opts['selected'] = 'selected' if selected_value.map(&:id).include? value
+        elsif selected_value.is_a? Array
+          opts['selected'] = 'selected' if selected_value.include? value.to_s
         else
           opts['selected'] = 'selected' if selected_value.to_s == value.to_s
         end
