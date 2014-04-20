@@ -5,7 +5,7 @@ module Conjoin
     INPUTS = [
       :boolean , :checkbox , :date  , :decimal , :file  , :hidden ,
       :integer , :password , :radio , :select  , :state , :string ,
-      :display , :datetime , :time  , :year
+      :display , :datetime , :time  , :year    , :text
     ]
 
     def self.setup app

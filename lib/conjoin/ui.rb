@@ -3,6 +3,8 @@ module Conjoin
     def panel options = {}, &block
       helper = self
 
+      options[:header] = options.delete :title if options.key? :title
+
       mab do
         div class: 'panel panel-default', id: options[:id] do
           if options.key? :header
