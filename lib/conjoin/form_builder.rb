@@ -188,7 +188,7 @@ module Conjoin
               html += fields.render
             end
           else
-            associated_record.each do |i, current_record|
+            associated_record.each_with_index do |current_record, i|
               nested_names = [].concat names
               nested_names << i
 
