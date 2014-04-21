@@ -9,7 +9,7 @@ module Conjoin
     ]
 
     def self.setup app
-      require 'mab/kernel_method'
+      require 'conjoin/mab'
 
       app.use Rack::Csrf
       app.plugin Conjoin::Csrf
