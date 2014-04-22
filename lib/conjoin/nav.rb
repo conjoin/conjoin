@@ -26,33 +26,44 @@ module Conjoin
         self.instance_eval(&block)
       end
 
-      def add_menu name, links
+      def nav name, links
         config.navs[name] ||= []
         config.navs[name].concat links
       end
 
       def load_nav name
         if links = config.navs[name]
-          loaded_links = []
-
-          links.each do |link|
-            link = OpenStruct.new(link)
-
-            if !link.if or app.instance_exec(&link.if)
-              link.icon         = config.icon_class + '-' + link.icon if link.icon
-              link.active       = app.req.env['REQUEST_PATH'][link.path]
-              link.active_class = link.active ? config.active_class : false
-
-              if link.active_class or !link.hidden
-                loaded_links << link
-              end
-            end
-          end
+          loaded_links = load_links links
         else
           raise "There isn't a nav called: #{name}"
         end
 
         block.call loaded_links
+      end
+
+      def load_links links
+        loaded_links = []
+
+        links.each do |link|
+          link = OpenStruct.new(link)
+
+          if !link.if or app.instance_exec(&link.if)
+            link.icon         = config.icon_class + '-' + link.icon if link.icon
+            link.active       = app.req.env['REQUEST_PATH'][link.path]
+            link.active_class = link.active ? config.active_class : false
+            link.id           = "nav-#{link.text.underscore}"
+
+            if link.subs
+              link.subs = load_links link.subs
+            end
+
+            if link.active_class or !link.hidden
+              loaded_links << link
+            end
+          end
+        end
+
+        loaded_links
       end
 
       def config

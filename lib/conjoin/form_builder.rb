@@ -91,7 +91,7 @@ module Conjoin
       end
 
       def input_field field_name, options = {}
-        options[:wrapper] = false
+        options[:label] = false
         input field_name, options
       end
 
@@ -115,6 +115,8 @@ module Conjoin
           and mini_column = record_class.mini_record_columns[field_name] \
           and input_as = mini_column[:input_as]
             record_type = input_as.to_s.classify
+        elsif record_class.respond_to?(field_name) && record_class.send(field_name).is_a?(Enumerize::Attribute)
+          record_type = 'Select'
         else
           record_type = record_class.columns_hash[field_name.to_s].type.to_s.classify
         end
@@ -131,14 +133,20 @@ module Conjoin
           value: record.send(field_name),
           options: options,
           errors: record.errors.messages[field_name],
-          names: names
+          names: names,
+          field_name: field_name,
+          record_class: record_class
         })
 
         new_input = input_class.new data, app, record
 
         if record_type != 'Hidden' \
         and not options.key(:wrapper) and options[:wrapper] != false
-          wrapper field_name.to_s, nested_name, new_input, options
+          if !options.key(:label) and options[:label] != false
+            wrapper field_name.to_s, nested_name, new_input, options
+          else
+            new_input.render
+          end
         else
           new_input.render
         end

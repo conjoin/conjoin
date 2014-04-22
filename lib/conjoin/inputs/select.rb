@@ -1,6 +1,17 @@
 module Conjoin
   module FormBuilder
     class SelectInput < Input
+      def select_options
+        values_select = {}
+        values        = data.record_class.send(data.field_name).values
+
+        values.each do |value|
+          values_select[value] = value
+        end
+
+        values_select
+      end
+
       def display
         append_button = options.delete :append_button
         if options[:multiple]
