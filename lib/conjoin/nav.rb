@@ -1,3 +1,5 @@
+require 'uri'
+
 module Conjoin
   module Nav
     def self.setup app
@@ -49,7 +51,7 @@ module Conjoin
 
           if !link.if or app.instance_exec(&link.if)
             link.icon         = config.icon_class + '-' + link.icon if link.icon
-            link.active       = app.req.env['REQUEST_PATH'][link.path]
+            link.active       = URI.decode(app.req.env['REQUEST_URI'])[link.path]
             link.active_class = link.active ? config.active_class : false
             link.id           = "nav-#{link.text.underscore}"
 
