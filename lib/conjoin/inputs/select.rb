@@ -13,7 +13,11 @@ module Conjoin
       end
 
       def display
+        # We don't need the type
+        options.delete :type
+
         append_button = options.delete :append_button
+
         if options[:multiple]
           options[:name] += '[]'
         end

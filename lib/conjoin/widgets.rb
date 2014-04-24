@@ -211,21 +211,26 @@ module Conjoin
         js.to_s.gsub(/(\\|<\/|\r\n|\\3342\\2200\\2250|[\n\r"'])/) {|match| JS_ESCAPE[match] }
       end
 
-      def trigger event, data = {}
-        req.env[:widget_name] = req.params['widget_name']
-        trigger_event event, req.env[:widget_name], data.to_ostruct
+      def trigger t_event, data = {}
+        req.env[:loaded_widgets].each do |n, w|
+          w.trigger_event t_event, req.params['widget_name'], data.to_ostruct
+        end
       end
 
-      def trigger_event event, widget_name, data = {}
+      def trigger_event t_event, widget_name, data = {}
         if events = self.class.events
           events.each do |class_event, opts|
-            if class_event == event && (widget_name == folder.to_s or opts[:for].to_s == widget_name)
-              event = opts[:with] if opts[:with]
-
-              if method(event).parameters.length > 0
-                send(event, data)
+            if class_event == t_event && (widget_name == folder.to_s or opts[:for].to_s == widget_name)
+              if not opts[:with]
+                e = t_event
               else
-                send(event)
+                e = opts[:with]
+              end
+
+              if method(e) and method(e).parameters.length > 0
+                send(e, data)
+              else
+                send(e)
               end
             end
           end
