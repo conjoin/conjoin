@@ -43,7 +43,7 @@ module Conjoin
             if not options[:group]
               select_options.invert.each do |name, value|
                 option render_opts(value, selected_value, opts) do
-                  text (name != name.upcase ? name.titleize : name)
+                  text (name == name.downcase ? name.titleize : name)
                 end
               end
             else
