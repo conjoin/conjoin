@@ -5,7 +5,7 @@ module Conjoin
     def self.setup app
       @settings = OpenStruct.new({
         navs: OpenStruct.new,
-        icon_class: 'ico',
+        icon_class: 'fa fa',
         active_class: 'active open'
       })
       require "#{app.root}/config/nav.rb"

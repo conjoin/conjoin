@@ -12,6 +12,8 @@ module Conjoin
       require 'slim'
       require 'sass'
       require 'ostruct'
+      require 'stylus'
+      require 'stylus/tilt/stylus'
 
       # if ENV['RACK_ENV'] != 'production'
       #   require 'rugged'
@@ -43,7 +45,7 @@ module Conjoin
       when '.css', '.js'
         path = "#{plugin.settings[:path] || '/'}#{cache_string}assets/#{file}"
       else
-        path = "#{plugin.settings[:path] || '/'}#{cache_string}assets/images/#{file}"
+        path = "#{plugin.settings[:path] || '/'}#{cache_string}assets/#{file}"
       end
       "http#{req.env['SERVER_PORT'] == '443' ? 's' : ''}://#{req.env['HTTP_HOST']}#{path}"
     end
@@ -116,7 +118,7 @@ module Conjoin
           send(method, options)
         else
           app.send(type).each do |asset|
-            options[path] = asset_path asset.gsub(/\.coffee/, '.js').gsub(/\.scss/, '.css')
+            options[path] = asset_path asset.gsub(/\.coffee/, '.js').gsub(/\.(scss|styl)/, '.css')
             send(method, options)
           end
         end
@@ -184,7 +186,9 @@ module Conjoin
 
         case ext
         when 'css'
-          new_ext = 'scss' if stylesheet_assets.include? file + '.scss'
+          %w(scss styl).each do |type|
+            new_ext = type if stylesheet_assets.include? file + ".#{type}"
+          end
         when 'js'
           new_ext = 'coffee' if javascript_assets.include? file + '.coffee' \
                              or javascript_head_assets.include? file + '.coffee'

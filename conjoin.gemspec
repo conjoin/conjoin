@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "mab"
   spec.add_dependency "tilt"
   spec.add_dependency "sass"
+  spec.add_dependency "stylus"
   spec.add_dependency "coffee-script"
   spec.add_dependency "slim"
   spec.add_dependency "mimemagic"
