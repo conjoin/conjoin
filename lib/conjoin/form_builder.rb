@@ -11,7 +11,6 @@ module Conjoin
     def self.setup app
       require 'conjoin/mab'
 
-      app.use Rack::Csrf
       app.plugin Conjoin::Csrf
       # Dir["#{File.dirname(__FILE__)}/plugin/inputs/**/*.rb"].each  { |rb| require rb  }
       INPUTS.each do |input|

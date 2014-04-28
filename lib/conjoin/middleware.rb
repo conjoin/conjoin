@@ -16,6 +16,7 @@ module Conjoin
           # for ajax request over standard ones.
           # https://github.com/rkh/rack-protection/issues/11#issuecomment-9005539
           use Rack::Protection, except: :session_hijacking
+          use Rack::Csrf
 
           if not Conjoin.env.mounted? and Conjoin.env.development?
             require 'rack-livereload'
