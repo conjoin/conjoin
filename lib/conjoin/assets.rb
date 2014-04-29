@@ -45,7 +45,7 @@ module Conjoin
       when '.css', '.js'
         path = "#{plugin.settings[:path] || '/'}#{cache_string}assets/#{file}"
       else
-        path = "#{plugin.settings[:path] || '/'}#{cache_string}assets/#{file}"
+        path = "#{plugin.settings[:path] || '/'}#{cache_string}assets/images/#{file}"
       end
       "http#{req.env['SERVER_PORT'] == '443' ? 's' : ''}://#{req.env['HTTP_HOST']}#{path}"
     end
