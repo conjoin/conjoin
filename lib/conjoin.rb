@@ -9,14 +9,6 @@ require "conjoin/seeds"
 module Conjoin
   extend ClassMethods
 
-  if not env.mounted?
-    require 'active_record'
-    require 'action_mailer'
-    require 'slim'
-    require "tilt/coffee"
-    require "tilt/sass"
-  end
-
   autoload :ActiveRecord, "conjoin/active_record"
   autoload :Assets      , "conjoin/assets"
   autoload :Auth        , "conjoin/auth"

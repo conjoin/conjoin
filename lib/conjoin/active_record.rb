@@ -1,3 +1,9 @@
+require 'active_record'
+require 'enumerize'
+require 'protector'
+require 'mini_record'
+Protector::Adapters::ActiveRecord.activate!
+
 module Conjoin
   module ActiveRecord
     include ::ActiveRecord
@@ -7,14 +13,10 @@ module Conjoin
     end
 
     def self.setup app
-      require 'mini_record'
       self.app = app
       ActiveRecord::Base.send :include, Form
 
       if not Conjoin.env.mounted?
-        require 'enumerize'
-        require 'protector'
-        Protector::Adapters::ActiveRecord.activate!
         start_active_record
         ActiveRecord::Base.default_timezone = Time.zone
       end

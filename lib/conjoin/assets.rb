@@ -1,3 +1,14 @@
+require 'mimemagic'
+require 'base64'
+require 'slim'
+require 'sass'
+require 'ostruct'
+require 'stylus'
+require 'stylus/tilt/stylus'
+require 'slim'
+require "tilt/coffee"
+require "tilt/sass"
+
 module Conjoin
   module Assets
     class << self
@@ -6,14 +17,6 @@ module Conjoin
 
     def self.setup app
       self.app = app
-
-      require 'mimemagic'
-      require 'base64'
-      require 'slim'
-      require 'sass'
-      require 'ostruct'
-      require 'stylus'
-      require 'stylus/tilt/stylus'
 
       # if ENV['RACK_ENV'] != 'production'
       #   require 'rugged'
