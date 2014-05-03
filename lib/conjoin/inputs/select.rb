@@ -16,7 +16,8 @@ module Conjoin
         # We don't need the type
         options.delete :type
 
-        append_button = options.delete :append_button
+        append_button       = options.delete :append_button
+        append_split_button = options.delete :append_split_button
 
         if options[:multiple]
           options[:name] += '[]'
@@ -60,9 +61,7 @@ module Conjoin
           end
         end
 
-        if not append_button
-          content
-        else
+        if append_button
           mab do
             div class: 'input-group' do
               text! content
@@ -73,6 +72,35 @@ module Conjoin
               end
             end
           end
+        elsif append_split_button
+          first_button = append_split_button.shift
+
+          mab do
+            div class: 'input-group' do
+              text! content
+              div class: 'input-group-btn' do
+                button class: 'btn btn-primary', type: 'button', 'on-click-get' => first_button[:href] do
+                  text first_button[:text]
+                end
+                if append_split_button.length
+                  button class: 'btn btn-primary dropdown-toggle', 'data-toggle' => "dropdown", type: 'button' do
+                    span class: 'caret'
+                  end
+                  ul class: 'dropdown-menu pull-right', role: 'menu' do
+                    append_split_button.each do |b|
+                      li do
+                        a href: 'javascript:{};', 'on-click-get' => b[:href] do
+                          text b[:text]
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        else
+          content
         end
       end
 
