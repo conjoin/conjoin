@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+
+ENV['RACK_ENV'] = 'test'
+
+File.write '.env', '' unless File.exists? '.env'
+File.foreach ".env" do |line|
+  key, value = line.split "="
+  ENV[key] = value.gsub('\n', '').strip
+end
+
+require 'rubygems'
+require 'bundler/setup'
+
+require_relative "../app.rb"
+
+require 'rspec'
+require "capybara/dsl"
+require "rack/test"
+require 'awesome_print'
+require 'pry'
+
+module RSpecMixin
+  include Rack::Test::Methods
+  def app() Conjoin end
+end
+
+Capybara.app = Conjoin
+
+RSpec.configure do |c|
+  c.include Rack::Test::Methods
+  c.include Capybara::DSL
+  c.include RSpecMixin
+end
+
+load Gem.bin_path('rspec', 'rspec')

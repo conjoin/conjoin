@@ -1,0 +1,62 @@
+#!/usr/bin/env ruby
+
+if ARGV.empty?
+  puts "usage: conjoin [s (development)] [test]"
+  exit
+end
+
+ENV['RACK_ENV'] ||= 'development'
+
+require 'rubygems'
+require 'bundler/setup'
+require 'clap'
+
+module Conjoin
+  module CLI
+    extend self
+
+    VERSION = '0.0.1'
+
+    def version
+      say VERSION
+    end
+
+    def help(command)
+      # display help
+    end
+
+    def server env = 'development'
+      ENV['RACK_ENV'] = env
+      system("env $(cat .#{env}.env) mr-sparkle")
+    end
+
+    def console env = 'development'
+      ENV['CONJOIN_CONSOLE'] = 'true'
+      system("env $(cat .#{env}.env) pry -r ./config/console.rb")
+    end
+
+    def test env = 'test'
+      Dir["./test/**/*_test.rb"].each_with_index do |file, i|
+        if i != 0
+          print "   \e[90mFile: #{file}"
+        else
+          print "\n   \e[90mFile: #{file}"
+        end
+        system "env $(cat .#{env}.env) bin/cutest #{file}"
+      end
+    end
+
+    private
+
+    def root
+      File.expand_path(File.dirname(__FILE__))
+    end
+  end
+end
+
+Clap.run ARGV,
+  "s"    => Conjoin::CLI.method(:server),
+  "c"    => Conjoin::CLI.method(:console),
+  "test" => Conjoin::CLI.method(:test),
+  "-v"   => Conjoin::CLI.method(:version),
+  "-h"   => Conjoin::CLI.method(:help)
