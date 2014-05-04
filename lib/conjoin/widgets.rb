@@ -253,10 +253,6 @@ module Conjoin
         end
       end
 
-      def partial view, options
-        render view, options
-      end
-
       def partial template, locals = {}
         locals[:partial] = template
         render locals
