@@ -8,8 +8,7 @@ end
 ENV['RACK_ENV'] ||= 'development'
 
 require 'rubygems'
-require 'bundler'
-Bundler.require
+require 'bundler/setup'
 require 'clap'
 
 module Conjoin
