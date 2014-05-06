@@ -35,7 +35,7 @@ module Conjoin
     end
 
     def tests
-      env = ENV['RACK_ENV'] = 'test'
+      @env = 'test'
 
       Dir["./test/**/*_test.rb"].each_with_index do |file, i|
         if i != 0
@@ -49,6 +49,8 @@ module Conjoin
     end
 
     def cutest
+      @env = 'test'
+
       system_with_env "bundle exec cutest #{argv_string}"
     end
 
@@ -76,8 +78,6 @@ module Conjoin
         end
 
         if !no_changed_assets
-          env = ENV['RACK_ENV']
-
           File.foreach ".#{env}.env" do |line|
             key, value = line.split "="
             ENV[key] = value.gsub('\n', '').strip
@@ -155,6 +155,7 @@ module Conjoin
 
     def system_with_env command
       env_file = ".#{env}.env"
+
       if File.file? env_file
         system "env $(cat #{env_file}) #{command}"
       else
