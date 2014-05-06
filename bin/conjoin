@@ -1,0 +1,179 @@
+#!/usr/bin/env ruby
+
+if ARGV.empty?
+  puts "usage: conjoin [s (development)] [test]"
+  exit
+end
+
+ENV['RACK_ENV'] ||= 'development'
+
+require 'rubygems'
+require 'bundler/setup'
+require 'clap'
+
+module Conjoin
+  module CLI
+    extend self
+
+    VERSION = '0.1.0'
+
+    def version
+      say VERSION
+    end
+
+    def help(command)
+      # display help
+    end
+
+    def server
+      system_with_env 'mr-sparkle'
+    end
+
+    def console
+      ENV['CONJOIN_CONSOLE'] = 'true'
+      system_with_env "pry -r ./config/console.rb"
+    end
+
+    def tests
+      env = ENV['RACK_ENV'] = 'test'
+
+      Dir["./test/**/*_test.rb"].each_with_index do |file, i|
+        if i != 0
+          print "   \e[90mFile: #{file}"
+        else
+          print "\n   \e[90mFile: #{file}"
+        end
+
+        system_with_env "bin/cutest #{file}"
+      end
+    end
+
+    def cutest
+      system_with_env "bundle exec cutest #{argv_string}"
+    end
+
+    def rake
+      system_with_env "bundle exec rake #{argv_string}"
+    end
+
+    def deploy
+      unless %x[git log -1 --pretty=%B][/ran deploy and compiled files/]
+
+        if %x[git status][/Changes not staged/]
+          return puts 'Please commit all changes before deploying.'
+        end
+
+        sha          = %x[git rev-parse HEAD].gsub(/\n/, '')
+        previous_sha = File.open('sha').read
+
+        diff = `git diff --name-only #{previous_sha} #{sha}`
+
+        no_changed_assets = true
+
+        diff.split(/\n/).each do |d|
+          next if d[/^public\/assets/]
+          no_changed_assets &= !d[/\.(css|js|styl|scss|less|coffee)$/]
+        end
+
+        if !no_changed_assets
+          env = ENV['RACK_ENV']
+
+          File.foreach ".#{env}.env" do |line|
+            key, value = line.split "="
+            ENV[key] = value.gsub('\n', '').strip
+          end
+
+          app_path     = "#{Dir.pwd}/config/boot.rb"
+          file_content = File.open(app_path).read
+          require app_path
+          javascript = stylesheet = ''
+
+          app = file_content.match(/(^.*)\.initialize!/).to_a.last.constantize
+
+          FileUtils.rm_rf('public/assets')
+          new_app = app.new
+          app.all_assets.to_hash.each do |type, files|
+            files.each do |file|
+              next unless file.is_a? String
+
+              file.scan(/(.*)\.(\w*)/).each do |f, ext|
+                case type
+                when 'stylesheet'
+                  stylesheet += Conjoin::Assets.add_asset(new_app, f, 'css')
+                when 'javascript'
+                  javascript += Conjoin::Assets.add_asset(new_app, f, 'js')
+                end
+              end
+            end
+
+            case type
+            when 'stylesheet', 'javascript'
+              ext = type == 'stylesheet' ? 'css' : 'js'
+              path = "public/assets/#{type}-#{sha}.#{ext}"
+              tmp_path = "app/assets/#{type}-#{sha}.#{ext}"
+              FileUtils.mkdir_p File.dirname(tmp_path)
+              FileUtils.mkdir_p File.dirname(path)
+              File.write tmp_path, (type == 'stylesheet' ? stylesheet : javascript)
+              system "minify #{tmp_path} > #{path}"
+              File.delete tmp_path
+            end
+          end
+          File.write('sha', sha)
+          system 'git add --all && git commit -am "ran deploy and compiled files."'
+        end
+      end
+
+      system argv_string
+    end
+
+    private
+
+    def argv
+      @args ||= begin
+        ARGV.shift
+        ARGV
+      end
+
+      @args.each_with_index do |arg, i|
+        if arg[/\s/]
+          @args[i] = '"#{arg}"'
+        else
+          @args[i] = arg
+        end
+      end
+
+      @args
+    end
+
+    def env
+      @env ||= ENV['RACK_ENV'] = argv_string.length > 0 ? argv_string : 'development'
+    end
+
+    def argv_string
+      argv.join ' '
+    end
+
+    def system_with_env command
+      env_file = ".#{env}.env"
+      if File.file? env_file
+        system "env $(cat #{env_file}) #{command}"
+      else
+        system command
+      end
+    end
+
+    def root
+      File.expand_path(File.dirname(__FILE__))
+    end
+  end
+end
+
+Clap.run ARGV,
+  "s"      => Conjoin::CLI.method(:server),
+  "c"      => Conjoin::CLI.method(:console),
+  "tests"  => Conjoin::CLI.method(:test),
+  "test"   => Conjoin::CLI.method(:cutest),
+  "rake"   => Conjoin::CLI.method(:rake),
+  "deploy" => Conjoin::CLI.method(:deploy),
+  "-v"     => Conjoin::CLI.method(:version),
+  "-h"     => Conjoin::CLI.method(:help)
