@@ -44,11 +44,15 @@ module Conjoin
     end
 
     def asset_path file
-      case file[/(\.[^.]+)$/]
-      when '.css', '.js'
-        path = "#{plugin.settings[:path] || '/'}#{cache_string}assets/#{file}"
+      if Conjoin.env.production? or Conjoin.env.staging?
+        path = "#{plugin.settings[:path] || '/'}public/assets/#{file}"
       else
-        path = "#{plugin.settings[:path] || '/'}#{cache_string}assets/images/#{file}"
+        case file[/(\.[^.]+)$/]
+        when '.css', '.js'
+          path = "#{plugin.settings[:path] || '/'}#{cache_string}assets/#{file}"
+        else
+          path = "#{plugin.settings[:path] || '/'}#{cache_string}assets/images/#{file}"
+        end
       end
       "http#{req.env['SERVER_PORT'] == '443' ? 's' : ''}://#{req.env['HTTP_HOST']}#{path}"
     end
@@ -117,7 +121,14 @@ module Conjoin
 
       mab do
         if Conjoin.env.production? or Conjoin.env.staging?
-          options[path] = asset_path "#{type}.#{extention}"
+          Thread.current[:sha] ||= File.read "#{Assets.app.root}/sha"
+          case type
+          when :stylesheet_assets
+            name = 'stylesheet'
+          when :javascript_assets
+            name = 'javascript'
+          end
+          options[path] = asset_path "#{name}-#{Thread.current[:sha]}.#{extention}"
           send(method, options)
         else
           app.send(type).each do |asset|
