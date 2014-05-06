@@ -144,30 +144,8 @@ module Conjoin
       def assets_settings as
         settings[:assets].settings.merge! as
       end
-    end
 
-    class Helpers
-      def asset_path path
-        app.root + '/app/assets/' + path
-      end
-    end
-
-    class Routes < Struct.new(:settings)
-      def app
-        App.settings = settings
-        App.root = settings[:root]
-        App.plugin Conjoin::Cuba::Render
-        App.plugin Assets
-        App
-      end
-    end
-
-    # erb  = Tilt::ERBTemplate.new "#{Assets.app.root}/app/assets/#{file}.scss"
-    # scss = Tilt::ScssTemplate.new{ erb.render(Helpers.new)  }
-
-    # scss.render
-    class App < Conjoin::Cuba
-      def add_asset file, ext
+      def add_asset app, file, ext
         dir     = ''
         new_ext = false
 
@@ -190,20 +168,43 @@ module Conjoin
         case ext
         when 'css'
           %w(scss styl).each do |type|
-            new_ext = type if stylesheet_assets.include? file + ".#{type}"
+            new_ext = type if app.settings[:assets]['stylesheet'].include? file + ".#{type}"
           end
         when 'js'
-          new_ext = 'coffee' if javascript_assets.include? file + '.coffee' \
-                             or javascript_head_assets.include? file + '.coffee'
+          new_ext = 'coffee' if app.settings[:assets]['javascript'].include? file + '.coffee' \
+                             or app.settings[:assets]['javascript_head'].include? file + '.coffee'
         end
 
         if new_ext
-          render "#{Assets.app.root}/app/#{dir}#{file}.#{new_ext}"
+          app.render "#{Assets.app.root}/app/#{dir}#{file}.#{new_ext}"
         else
           File.read "#{Assets.app.root}/app/#{dir}#{file}.#{ext}"
         end
       end
+    end
+    extend ClassMethods
 
+    class Helpers
+      def asset_path path
+        app.root + '/app/assets/' + path
+      end
+    end
+
+    class Routes < Struct.new(:settings)
+      def app
+        App.settings = settings
+        App.root = settings[:root]
+        App.plugin Conjoin::Cuba::Render
+        App.plugin Assets
+        App
+      end
+    end
+
+    # erb  = Tilt::ERBTemplate.new "#{Assets.app.root}/app/assets/#{file}.scss"
+    # scss = Tilt::ScssTemplate.new{ erb.render(Helpers.new)  }
+
+    # scss.render
+    class App < Conjoin::Cuba
       define do
         on get, accepted_assets do |file, ext|
           res.headers["Content-Type"] = "#{MimeMagic.by_extension(ext).to_s}; charset=utf-8"
@@ -217,7 +218,7 @@ module Conjoin
 
             res.write content
           else
-            res.write add_asset file, ext
+            res.write Assets.add_asset(self, file, ext)
           end
         end
       end
