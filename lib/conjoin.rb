@@ -21,6 +21,7 @@ module Conjoin
   autoload :Ui          , "conjoin/ui"
   autoload :JQuery      , "conjoin/jquery"
   autoload :Nav         , "conjoin/nav"
+  autoload :AuthToken   , "conjoin/auth_token"
   # ActionMailer
   # https://gist.github.com/acwright/1944639
   # DelayedJob
