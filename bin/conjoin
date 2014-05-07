@@ -26,16 +26,18 @@ module Conjoin
     end
 
     def server
+      set_env
       system_with_env 'mr-sparkle'
     end
 
     def console
+      set_env
       ENV['CONJOIN_CONSOLE'] = 'true'
       system_with_env "pry -r ./config/console.rb"
     end
 
     def tests
-      ENV['RACK_ENV'] = @env = 'test'
+      @env = ENV['RACK_ENV'] = 'test'
 
       Dir["./test/**/*_test.rb"].each_with_index do |file, i|
         if i != 0
@@ -49,7 +51,7 @@ module Conjoin
     end
 
     def cutest
-      ENV['RACK_ENV'] = @env = 'test'
+      @env = ENV['RACK_ENV'] = 'test'
 
       require "cuba/test"
       require 'awesome_print'
@@ -149,7 +151,7 @@ module Conjoin
     end
 
     def env
-      @env ||= ENV['RACK_ENV'] = argv_string.length > 0 ? argv_string : 'development'
+      @env = ENV['RACK_ENV'] ||= ENV['RACK_ENV'] || 'development'
     end
 
     def argv_string
@@ -164,6 +166,10 @@ module Conjoin
       else
         system command
       end
+    end
+
+    def set_env
+      @env = ENV['RACK_ENV'] = argv_string if !argv_string.empty?
     end
 
     def root
