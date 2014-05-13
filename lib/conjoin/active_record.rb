@@ -330,7 +330,7 @@ module ActiveRecord
               #############################################
               #############################################
               #############################################
-              value    = owner.class.base_class.name.gsub(/\w+::/, '')
+              value    = owner.class.base_class.name.gsub(/\w+::{1}(\w+::\w+)/, '\1')
               #############################################
               bind_val = bind scope, table.table_name, reflection.type.to_s, value
               scope    = scope.where(table[reflection.type].eq(bind_val))
