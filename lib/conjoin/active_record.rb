@@ -67,9 +67,13 @@ module Conjoin
       def validate
       end
 
-      def validates req_params
+      def validates req_params, opts = {}
         req_params = req_params.is_a?(OpenStruct) ? req_params.to_hash : HashIndifferent.new(req_params)
         @req_params = req_params
+
+        if as = opts.delete(:as)
+          add_creator_and_updater_for self, as, req_params
+        end
 
         run_callbacks :validates do
           self.attributes = req_params
