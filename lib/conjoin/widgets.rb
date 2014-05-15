@@ -212,8 +212,11 @@ module Conjoin
       end
 
       def trigger t_event, data = {}
+        wid = data.delete(:for).to_s
+
         req.env[:loaded_widgets].each do |n, w|
-          w.trigger_event t_event, req.params['widget_name'], data.to_ostruct
+          w.trigger_event t_event, (wid || req.params['widget_name']),
+            data.to_ostruct
         end
       end
 
