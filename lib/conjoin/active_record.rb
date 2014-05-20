@@ -16,7 +16,8 @@ module Conjoin
       self.app = app
       ActiveRecord::Base.send :include, Form
 
-      if not Conjoin.env.mounted?
+      # if not Conjoin.env.mounted?
+      unless ActiveRecord::Base.connected?
         start_active_record
         ActiveRecord::Base.default_timezone = Time.zone
       end
@@ -25,13 +26,13 @@ module Conjoin
     private
 
     def self.start_active_record
-      if not Conjoin.env.test?
-        return if ActiveRecord::Base.connected?
-      else
+      # if not Conjoin.env.test?
+      #   return if ActiveRecord::Base.connected?
+      # else
         if ActiveRecord::Base.connected?
           ActiveRecord::Base.connection.disconnect!
         end
-      end
+      # end
       # ActiveRecord::Base.logger = Logger.new(STDERR) unless @app.test?
 
       db = URI.parse ENV['DATABASE_URL']
