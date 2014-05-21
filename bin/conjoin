@@ -100,7 +100,8 @@ module Conjoin
           app = file_content.match(/(^.*)\.initialize!/)
                             .to_a.last.constantize
 
-          FileUtils.rm_rf('public/assets')
+          FileUtils.rm Dir.glob("public/assets/*.css")
+          FileUtils.rm Dir.glob("public/assets/*.js")
           new_app = app.new
           app.all_assets.to_hash.each do |type, files|
             files.each do |file|
