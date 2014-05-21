@@ -7,7 +7,7 @@ require 'stylus'
 require 'stylus/tilt/stylus'
 require 'slim'
 require "tilt/coffee"
-require "tilt/sass"
+# require "tilt/sass"
 
 module Conjoin
   module Assets
