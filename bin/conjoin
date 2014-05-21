@@ -70,19 +70,23 @@ module Conjoin
           return puts 'Please commit all changes before deploying.'
         end
 
-        sha          = %x[git rev-parse HEAD].gsub(/\n/, '')
-        previous_sha = File.open('sha').read
-
-        diff = `git diff --name-only #{previous_sha} #{sha}`
-
+        sha               = %x[git rev-parse HEAD].gsub(/\n/, '')
         no_changed_assets = true
 
-        diff.split(/\n/).each do |d|
-          next if d[/^public\/assets/]
-          no_changed_assets &= !d[/\.(css|js|styl|scss|less|coffee)$/]
+        if File.exist? 'sha'
+          previous_sha = File.open('sha').read
+
+          diff = `git diff --name-only #{previous_sha} #{sha}`
+
+          diff.split(/\n/).each do |d|
+            next if d[/^public\/assets/]
+            no_changed_assets &= !d[/\.(css|js|styl|scss|less|coffee)$/]
+          end
+        else
+          previous_sha = false
         end
 
-        if !no_changed_assets
+        if !previous_sha || !no_changed_assets
           File.foreach ".#{env}.env" do |line|
             key, value = line.split "="
             ENV[key] = value.gsub('\n', '').strip
@@ -93,7 +97,8 @@ module Conjoin
           require app_path
           javascript = stylesheet = ''
 
-          app = file_content.match(/(^.*)\.initialize!/).to_a.last.constantize
+          app = file_content.match(/(^.*)\.initialize!/)
+                            .to_a.last.constantize
 
           FileUtils.rm_rf('public/assets')
           new_app = app.new
