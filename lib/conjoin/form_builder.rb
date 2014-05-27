@@ -106,7 +106,12 @@ module Conjoin
         # create field names that map to the correct models
         nested_name = nested_names_for names
 
-        record_class = record.class.model_name.name.constantize
+        begin
+          record_class = record.class.model_name.name.constantize
+        rescue Exception
+          m = models.join('.').gsub /_attributes/, ''
+          raise "No value for #{field_name} as #{m} is nil."
+        end
 
         if as = options.delete(:as)
           record_type = as.to_s.classify

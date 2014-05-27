@@ -270,7 +270,8 @@ module Conjoin
           state = view = args.first
           locals = args.length > 1 ? args.last : {}
         end
-        state = @widget_state if widget_state
+
+        state = widget_state if widget_state
 
         unless view.present?
           state = view = caller[0][/`.*'/][1..-2]
