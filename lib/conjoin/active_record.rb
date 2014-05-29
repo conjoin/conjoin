@@ -37,7 +37,8 @@ module Conjoin
 
       db = URI.parse ENV['DATABASE_URL']
 
-      ActiveRecord::Base.establish_connection(
+      ActiveRecord::Base.configurations = {
+        'default' => {
           adapter: db.scheme == 'postgres' ? 'postgresql' : db.scheme,
           encoding: 'utf8',
           reconnect: true,
@@ -48,7 +49,10 @@ module Conjoin
           username: db.user,
           password: db.password,
           wait_timeout: 2147483
-      )
+        }
+      }
+
+      ActiveRecord::Base.establish_connection('default')
     end
 
     module Form
