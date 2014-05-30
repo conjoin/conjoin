@@ -1,3 +1,17 @@
+ENV['RACK_ENV'] ||= 'development'
+
+env      = '.env'
+rack_env = ".#{ENV['RACK_ENV']}#{env}"
+
+if File.file? rack_env
+  env = rack_env
+end
+
+File.foreach env do |line|
+  key, value = line.split "="
+  ENV[key] = value.gsub('\n', '').strip
+end
+
 require 'active_record'
 require 'active_support/core_ext/string/strip'
 require 'fileutils'
