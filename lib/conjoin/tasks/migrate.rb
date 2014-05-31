@@ -5,11 +5,15 @@ rack_env = ".#{ENV['RACK_ENV']}#{env}"
 
 if File.file? rack_env
   env = rack_env
+elsif !File.file? env
+  env = false
 end
 
-File.foreach env do |line|
-  key, value = line.split "="
-  ENV[key] = value.gsub('\n', '').strip
+if env
+  File.foreach env do |line|
+    key, value = line.split "="
+    ENV[key] = value.gsub('\n', '').strip
+  end
 end
 
 require 'active_record'
