@@ -54,6 +54,7 @@ module Conjoin
             link.active       = URI.decode(app.req.env['REQUEST_URI'])[link.path]
             link.active_class = link.active ? config.active_class : false
             link.id           = "nav-#{link.text.underscore}"
+            link.label        = app.instance_exec(&link.label) if link.label
 
             if link.subs
               link.subs = load_links link.subs
