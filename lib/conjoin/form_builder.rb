@@ -109,7 +109,7 @@ module Conjoin
         begin
           record_class = record.class.model_name.name.constantize
         rescue Exception
-          m = models.join('.').gsub /_attributes/, ''
+          m = models.join('.').gsub(/_attributes/, '')
           raise "No value for #{field_name} as #{m} is nil."
         end
 
@@ -339,7 +339,22 @@ module Conjoin
       end
 
       def display
-        mab { input options }
+        append_button = options.delete :append_button
+
+        if append_button
+          mab do
+            div class: 'input-group' do
+              input options
+              div class: 'input-group-btn' do
+                button class: 'btn btn-primary', type: append_button[:type] || 'button', 'on-click-get' => append_button[:href] do
+                  text append_button[:text]
+                end
+              end
+            end
+          end
+        else
+          mab { input options }
+        end
       end
     end
   end
