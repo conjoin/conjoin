@@ -1,5 +1,6 @@
 require "conjoin/version"
-require "conjoin/recursive_ostruct"
+require "cuba/bin/inflectors"
+# require "conjoin/recursive_ostruct"
 require "conjoin/middleware"
 require "conjoin/env_string"
 require "conjoin/class_methods"
