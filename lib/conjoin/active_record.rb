@@ -73,7 +73,7 @@ module Conjoin
       end
 
       def validates req_params, opts = {}
-        req_params = req_params.is_a?(OpenStruct) ? req_params.to_hash : HashIndifferent.new(req_params)
+        req_params = req_params.is_a?(OpenStruct) ? req_params.to_hash : DeepOpenStruct.new(req_params)
         @req_params = req_params
 
         if as = opts.delete(:as)
