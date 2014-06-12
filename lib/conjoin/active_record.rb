@@ -73,7 +73,7 @@ module Conjoin
       end
 
       def validates req_params, opts = {}
-        req_params = req_params.is_a?(OpenStruct) ? req_params.to_hash : DeepOpenStruct.new(req_params)
+        req_params  = req_params.to_h
         @req_params = req_params
 
         if as = opts.delete(:as)
@@ -129,6 +129,7 @@ module Conjoin
         return unless current_params
         # loop through associated records
         current_params.each do |name, value|
+          name = name.to_s
           if name.end_with?("_attributes")
             associated_name  = name.gsub(/_attributes$/, '')
             associated_model = model.try associated_name
@@ -141,6 +142,7 @@ module Conjoin
             elsif associated_model.kind_of? ActiveRecord::Associations::CollectionProxy
               new_current_params = current_params[name]
               associated_model.each_with_index do |current_model, i|
+                new_current_params ||= []
                 add_creator_and_updater_for current_model, current_user, new_current_params[i]
               end
             end
