@@ -103,7 +103,7 @@ module Conjoin
           FileUtils.rm Dir.glob("public/assets/*.css")
           FileUtils.rm Dir.glob("public/assets/*.js")
           new_app = app.new
-          app.all_assets.to_hash.each do |type, files|
+          app.all_assets.to_h.each do |type, files|
             files.each do |file|
               next unless file.is_a? String
 
