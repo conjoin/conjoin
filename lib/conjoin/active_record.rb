@@ -135,12 +135,12 @@ module Conjoin
             associated_model = model.try associated_name
 
             if associated_model.kind_of? ::ActiveRecord::Base
-              new_current_params = current_params[name]
+              new_current_params = (current_params[name.to_sym] || current_params[name])
               if new_current_params.kind_of? Hash
                 add_creator_and_updater_for associated_model, current_user, new_current_params
               end
             elsif associated_model.kind_of? ActiveRecord::Associations::CollectionProxy
-              new_current_params = current_params[name]
+              new_current_params = (current_params[name.to_sym] || current_params[name])
               associated_model.each_with_index do |current_model, i|
                 new_current_params ||= []
                 add_creator_and_updater_for current_model, current_user, new_current_params[i]
