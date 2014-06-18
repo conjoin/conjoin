@@ -15,7 +15,7 @@ module Conjoin
           # we need to disable session_hijacking because IE uses different headers
           # for ajax request over standard ones.
           # https://github.com/rkh/rack-protection/issues/11#issuecomment-9005539
-          use Rack::Protection, except: :session_hijacking
+          use Rack::Protection, except: [:session_hijacking, :http_origin]
           use Rack::Csrf
 
           if not Conjoin.env.mounted? and Conjoin.env.development?
