@@ -1,7 +1,7 @@
 ENV['RACK_ENV'] ||= 'development'
 
 env      = '.env'
-rack_env = ".#{ENV['RACK_ENV']}#{env}"
+rack_env = "#{env}.#{ENV['RACK_ENV']}"
 
 if File.file? rack_env
   env = rack_env
