@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "cuba", "~> 3.1.1", '>= 3.1.1'
-  spec.add_dependency "cuba-sugar", "~> 0.3.0", '>= 0.3.0'
+  spec.add_dependency "cuba-sugar-cj", "~> 0.3.0", '>= 0.3.0'
   spec.add_dependency "dominate"
   spec.add_dependency "rack_csrf", "~> 2.4.0", '>= 2.4.0'
   spec.add_dependency "rack-protection", "~> 1.5.2", '>= 1.5.2'
