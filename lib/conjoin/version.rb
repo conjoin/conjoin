@@ -1,3 +1,3 @@
 module Conjoin
-  VERSION = "0.0.77"
+  VERSION = "0.0.80"
 end
