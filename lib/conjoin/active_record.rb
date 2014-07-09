@@ -52,7 +52,7 @@ module Conjoin
         }
       }
 
-      ActiveRecord::Base.establish_connection('default')
+      ActiveRecord::Base.establish_connection(:default)
     end
 
     module Form
