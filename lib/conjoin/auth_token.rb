@@ -10,18 +10,28 @@ module Conjoin
       @settings
     end
 
-    def self.encrypt auth_token
+    def self.encrypt auth_token, iv=nil, salt=nil
       auth_token = auth_token.to_json
 
-      Base64.encode64(Encryptor.encrypt auth_token, key: AuthToken.settings.key, salt: begin
-        "%AuthToken%#{AuthToken.settings.salt}%#{auth_token}%Salt%"
-      end).strip
+      if iv.present?
+        encrypted = Encryptor.encrypt auth_token, key: AuthToken.settings.key, iv: iv,
+                    salt: salt
+      else
+        encrypted = Encryptor.encrypt auth_token, key: AuthToken.settings.key
+      end
+
+      Base64.encode64(encrypted).strip
     end
 
-    def self.decrypt auth_token
-      JSON.parse Encryptor.decrypt(Base64.decode64(auth_token), key: AuthToken.settings.key, salt: begin
-        "%AuthToken%#{AuthToken.settings.salt}%#{auth_token}%Salt%"
-      end)
+    def self.decrypt auth_token, iv=nil, salt=nil
+      if iv.present?
+        decrypted = Encryptor.decrypt Base64.decode64(auth_token), key: AuthToken.settings.key, iv: iv,
+                    salt: salt
+      else
+        decrypted = Encryptor.decrypt Base64.decode64(auth_token), key: AuthToken.settings.key
+      end
+
+      JSON.parse decrypted
     end
 
     class Middleware
@@ -42,17 +52,22 @@ module Conjoin
         end
 
         def respond
-          if auth_token = req.params['auth_token']
-            obj = AuthToken.decrypt auth_token
+          if req.params['auth_token'] and (auth_token = req.params['auth_token']) and\
+             req.params['iv'] and (iv = Base64.decode64(req.params['iv']))
+
+            salt = Base64.decode64(req.params['salt']) if req.params['salt']
+            salt ||= nil
+
+            obj = AuthToken.decrypt auth_token, iv, salt
 
             if Time.now < Time.parse(obj['expires_at'])
-              user = AuthToken.settings.klass.constantize.find obj['id']
+              user = AuthToken.settings.klass.constantize.find_by_username obj['username']
               case AuthToken.settings.type.to_sym
               when :warden
-                req.env['warden'].set_user(user, scope: :user)
+                req.env['warden'].set_user(user, scope: :user) if user
               when :shield
                 req.session.clear
-                req.session[AuthToken.settings.klass] = obj['id']
+                req.session[AuthToken.settings.klass] = user.id if user
               end
             end
           end
