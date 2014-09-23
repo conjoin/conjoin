@@ -69,6 +69,8 @@ module Conjoin
                 req.session.clear
                 req.session[AuthToken.settings.klass] = user.id if user
               end
+
+              res.redirect 'login?return=%2F&sso_error=1' unless user
             end
           end
 
