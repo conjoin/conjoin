@@ -54,7 +54,7 @@ module Conjoin
           path = "#{plugin.settings[:path] || '/'}#{cache_string}assets/images/#{file}"
         end
       end
-      "http#{req.env['SERVER_PORT'] == '443' ? 's' : ''}://#{req.env['HTTP_HOST']}#{path}"
+      "http#{Conjoin.env.production?? 's' : ''}://#{req.env['HTTP_HOST']}#{path}"
     end
 
     def image_tag file, options = {}
